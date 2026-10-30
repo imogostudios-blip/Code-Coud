@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeNest · local GitHub</title>
+  <!-- Google Sign-In Library -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Font & Icons (for clean look) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* Reset & base – pure white background, simple font */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background-color: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      color: #1f2328;
+    }
+
+    /* ----- GOOGLE LOGIN OVERLAY ----- */
+    #auth-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      gap: 20px;
+    }
+
+    .auth-card {
+      background: #f6f8fa;
+      border: 1px solid #d0d7de;
+      padding: 40px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .auth-card h2 {
+      margin-bottom: 10px;
+      color: #24292f;
+    }
+
+    .auth-card p {
+      color: #57606a;
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+    }
+
+    /* ----- TOP NAVIGATION BAR (like GitHub) ----- */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background-color: #FFFFFF;
+      border-bottom: 1px solid #d0d7de;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 1.25rem;
+      color: #24292f;
+    }
+
+    .logo-area i {
+      font-size: 1.6rem;
+      color: #24292f;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #24292f;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid transparent;
+    }
+
+    .nav-btn i {
+      font-size: 1rem;
+    }
+
+    .nav-btn:hover {
+      background-color: #f6f8fa;
+      border-color: #d0d7de;
+    }
+
+    .nav-btn.active {
+      background-color: #C2E7FF;
+      border-color: #a0c8e0;
+      font-weight: 600;
+      color: #0a2540;
+    }
+
+    /* user / action area (right side) */
+    .user-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .user-profile-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #24292f;
+      background: #f6f8fa;
+      padding: 4px 12px 4px 4px;
+      border-radius: 30px;
+      border: 1px solid #d0d7de;
+    }
+
+    .user-profile-display img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+    }
+
+    .btn-soft {
+      background-color: #D9FDD3;
+      border: 1px solid #b8e0b0;
+      color: #1f4a1a;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-soft i {
+      font-size: 0.9rem;
+    }
+
+    .btn-soft:hover {
+      background-color: #c8f0c0;
+      border-color: #9ccf94;
+    }
+
+    /* primary blue button (C2E7FF) */
+    .btn-primary {
+      background-color: #C2E7FF;
+      border: 1px solid #9ac8e6;
+      color: #0a2b42;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.1s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #b0dbff;
+      border-color: #84b9e0;
+    }
+
+    /* ----- MAIN APP LAYOUT (3 columns) ----- */
+    .app-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr 300px;
+      gap: 20px;
+      padding: 20px 24px;
+      flex: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* LEFT PANEL – repositories & sections */
+    .left-panel {
+      background-color: #ffffff;
+      border: 1px solid #d0d7de;
+      border-radius: 16px;
+      padding: 18px 16px;
+      height: fit-content;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #656d76;
+      margin: 16px 0 10px 8px;
+      font-weight: 600;
+    }
+
+    .section-title:first-of-type {
+      margin-top: 4px;
+    }
+
+    .repo-item, .project-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.1s;
+      gap: 10px;
+      font-size: 0.95rem;
+      border: 1px solid transparent;
+    }
+
+    .repo-item:hover, .project-item:hover {
+      background-color: #f6f8fa;
+      border-color: #e1e4e8;
+    }
+
+    .repo-item i, .project-item i {
+      width: 18px;
+      color: #57606a;
+      font-size: 1rem;
+    }
+
+    .repo-item span, .project-item span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .saved-section {
+      margin-top: 24px;
+      border-top: 1px solid #e1e4e8;
+      padding-top: 16px;
+    }
+
+    /* CENTER – main editor / preview / repo view */
+    .center-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0; /* prevent overflow */
+    }
+
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      background-color: #ffffff;
+      border: 1px solid #d0d7de;
+      border-radius: 40px;
+      padding: 6px 6px 6px 18px;
+      justify-content: space-between;
+    }
+
+    .file-tabs {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .file-tab {
+      background: transparent;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #24292f;
+    }
+
+    .file-tab.active {
+      background-color: #C2E7FF;
+      font-weight: 500;
+    }
+
+    .file-tab i {
+      font-size: 0.8rem;
+      color: #57606a;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-small {
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      border: 1px solid #d0d7de;
+      background: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-small.primary-soft {
+      background-color: #C2E7FF;
+      border-color: #9ac8e6;
+    }
+
+    .btn-small.green-soft {
+      background-color: #D9FDD3;
+      border-color: #b8e0b0;
+    }
+
+    .main-editor-area {
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      border: 1px solid #d0d7de;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .editor-header {
+      background-color: #f6f8fa;
+      padding: 10px 16px;
+      border-bottom: 1px solid #d0d7de;
+      font-size: 0.85rem;
+      color: #24292f;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .code-editor {
+      width: 100%;
+      min-height: 340px;
+      padding: 16px 18px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      border: none;
+      outline: none;
+      resize: vertical;
+      background: #ffffff;
+      tab-size: 2;
+    }
+
+    .preview-area {
+      background: #ffffff;
+      border: 1px solid #d0d7de;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      color: #656d76;
+    }
+
+    .preview-frame {
+      width: 100%;
+      min-height: 180px;
+      border: 1px solid #e1e4e8;
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      overflow: auto;
+    }
+
+    /* RIGHT PANEL – quick actions & repo list */
+    .right-panel {
+      background-color: #ffffff;
+      border: 1px solid #d0d7de;
+      border-radius: 16px;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: fit-content;
+    }
+
+    .action-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #f9fafb;
+      padding: 16px 14px;
+      border-radius: 14px;
+      border: 1px solid #e5e9ed;
+    }
+
+    .action-card h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #24292f;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 30px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border: 1px solid #d0d7de;
+      background: white;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .btn-block.blue {
+      background: #C2E7FF;
+      border-color: #9ac8e6;
+    }
+
+    .btn-block.green {
+      background: #D9FDD3;
+      border-color: #b8e0b0;
+    }
+
+    /* footer line */
+    .bottom-divider {
+      height: 1px;
+      background-color: #FFFFFF;
+      border-top: 1px solid #d0d7de;
+      margin: 0;
+      width: 100%;
+    }
+
+    .status-badge {
+      font-size: 0.7rem;
+      background: #eaeef2;
+      padding: 2px 8px;
+      border-radius: 30px;
+      color: #24292f;
+    }
+
+    /* responsive */
+    @media (max-width: 1000px) {
+      .app-grid {
+        grid-template-columns: 1fr;
+      }
+      .top-nav {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- GOOGLE LOGIN OVERLAY (Mandatory on every load) -->
+  <div id="auth-overlay">
+    <div class="auth-card">
+      <h2><i class="fas fa-code-branch"></i> CodeNest</h2>
+      <p>Please sign in with your Google account to access your local repositories and editor.</p>
+      
+      <!-- Google Sign-In Button Container -->
+      <div id="g_id_onload"
+           data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+           data-callback="handleCredentialResponse"
+           data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin"
+           data-type="standard"
+           data-shape="rectangular"
+           data-theme="outline"
+           data-text="sign_in_with"
+           data-size="large"
+           data-logo_alignment="left">
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP NAVIGATION BAR -->
+  <nav class="top-nav">
+    <div class="logo-area">
+      <i class="fas fa-code-branch"></i>
+      <span>CodeNest</span>
+    </div>
+    <div class="nav-tabs" id="mainNavTabs">
+      <button class="nav-btn active" data-view="home"><i class="fas fa-home"></i> Home</button>
+      <button class="nav-btn" data-view="repos"><i class="fas fa-folder"></i> Repositories</button>
+      <button class="nav-btn" data-view="search"><i class="fas fa-search"></i> Search</button>
+      <button class="nav-btn" data-view="saved"><i class="fas fa-bookmark"></i> Saved library</button>
+    </div>
+    <div class="user-actions">
+      <!-- User profile info injected dynamically -->
+      <div class="user-profile-display" id="userProfileDisplay">
+        <img id="userAvatar" src="" alt="User">
+        <span id="userNameText">User</span>
+      </div>
+      <button class="btn-soft" id="newRepoBtn"><i class="fas fa-plus"></i> New repo</button>
+      <button class="btn-primary" id="uploadFileBtn"><i class="fas fa-upload"></i> Upload</button>
+    </div>
+  </nav>
+
+  <!-- MAIN 3-COLUMN GRID -->
+  <div class="app-grid">
+    <!-- LEFT PANEL: repositories & projects -->
+    <aside class="left-panel">
+      <div class="section-title"><i class="fas fa-database" style="margin-right: 6px;"></i> Your repositories</div>
+      <div id="repoListLeft">
+        <div class="repo-item" data-repo="local-project">
+          <i class="fas fa-folder"></i><span>local-project</span><span class="status-badge">main</span>
+        </div>
+        <div class="repo-item" data-repo="web-sandbox">
+          <i class="fas fa-folder"></i><span>web-sandbox</span>
+        </div>
+        <div class="repo-item" data-repo="utils">
+          <i class="fas fa-folder"></i><span>utils</span>
+        </div>
+      </div>
+
+      <div class="section-title"><i class="fas fa-bookmark" style="margin-right: 6px;"></i> Saved projects</div>
+      <div id="savedProjectsLeft">
+        <div class="project-item" data-project="todo-app">
+          <i class="fas fa-code"></i><span>todo-app.html</span>
+        </div>
+        <div class="project-item" data-project="landing-page">
+          <i class="fas fa-code"></i><span>landing-page</span>
+        </div>
+        <div class="project-item" data-project="dashboard">
+          <i class="fas fa-code"></i><span>dashboard.js</span>
+        </div>
+      </div>
+
+      <div class="saved-section" id="savedLibraryBlock" style="display:none;">
+        <div class="section-title">📚 Library (saved)</div>
+        <div class="project-item"><i class="fas fa-file-alt"></i><span>README.md</span></div>
+        <div class="project-item"><i class="fas fa-file-code"></i><span>script.js</span></div>
+        <div class="project-item"><i class="fas fa-file-css"></i><span>styles.css</span></div>
+      </div>
+    </aside>
+
+    <!-- CENTER PANEL: editor + preview -->
+    <main class="center-panel">
+      <div class="editor-toolbar">
+        <div class="file-tabs" id="fileTabs">
+          <button class="file-tab active"><i class="fas fa-file-code"></i> index.html</button>
+          <button class="file-tab"><i class="fas fa-file-code"></i> script.js</button>
+          <button class="file-tab"><i class="fas fa-file-css"></i> styles.css</button>
+        </div>
+        <div class="editor-actions">
+          <button class="btn-small primary-soft" id="runPreviewBtn"><i class="fas fa-play"></i> Preview</button>
+          <button class="btn-small green-soft" id="saveFileBtn"><i class="fas fa-save"></i> Save</button>
+        </div>
+      </div>
+
+      <!-- code editor block -->
+      <div class="main-editor-area">
+        <div class="editor-header">
+          <span><i class="fas fa-file-code"></i> index.html · editing</span>
+          <span class="status-badge" id="editorStatus">unsaved changes</span>
+        </div>
+        <textarea class="code-editor" id="codeEditor" spellcheck="false">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;My local project&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hello, CodeNest!&lt;/h1&gt;
+  &lt;p&gt;Edit this code and preview it instantly.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</textarea>
+      </div>
+
+      <!-- preview block -->
+      <div class="preview-area">
+        <div class="preview-header">
+          <span><i class="fas fa-eye"></i> Live preview</span>
+          <span class="status-badge">rendered</span>
+        </div>
+        <iframe class="preview-frame" id="previewFrame" srcdoc="<h1>Hello, CodeNest!</h1><p>Edit this code and preview it instantly.</p>"></iframe>
+      </div>
+    </main>
+
+    <!-- RIGHT PANEL: actions & shortcuts -->
+    <aside class="right-panel">
+      <div class="action-card">
+        <h4><i class="fas fa-rocket"></i> Quick actions</h4>
+        <button class="btn-block blue" id="newProjectBtn"><i class="fas fa-plus-circle"></i> New project</button>
+        <button class="btn-block green" id="uploadLocalBtn"><i class="fas fa-cloud-upload-alt"></i> Upload file</button>
+        <button class="btn-block" id="createRepoRightBtn"><i class="fas fa-folder-plus"></i> Create repository</button>
+      </div>
+
+      <div class="action-card">
+        <h4><i class="fas fa-list"></i> Recent files</h4>
+        <div class="project-item"><i class="fas fa-file"></i> index.html</div>
+        <div class="project-item"><i class="fas fa-file"></i> app.js</div>
+        <div class="project-item"><i class="fas fa-file"></i> README.md</div>
+      </div>
+
+      <div class="action-card">
+        <h4><i class="fas fa-info-circle"></i> Local storage</h4>
+        <p style="font-size:0.8rem; color:#57606a;">All files saved in local memory.</p>
+        <button class="btn-block" id="syncIndexedDB"><i class="fas fa-database"></i> Save state</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="bottom-divider"></div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // --- Google Auth Decoding & Handling ---
+    function decodeJwtResponse(token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('0' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    }
+
+    function handleCredentialResponse(response) {
+      const responsePayload = decodeJwtResponse(response.credential);
+      
+      // Set user info
+      document.getElementById('userNameText').innerText = responsePayload.name.split(' ')[0];
+      document.getElementById('userAvatar').src = responsePayload.picture;
+      
+      // Hide login overlay
+      document.getElementById('auth-overlay').style.display = 'none';
+    }
+
+    (function() {
+      const DB_NAME = 'CodeNestLocalDB';
+
+      function initStorage() {
+        if (!localStorage.getItem('codenest_files')) {
+          const initialFiles = {
+            'index.html': `<!DOCTYPE html>\n<html>\n<head>\n  <title>My local project</title>\n</head>\n<body>\n  <h1>Hello, CodeNest!</h1>\n  <p>Edit this code and preview it instantly.</p>\n</body>\n</html>`,
+            'script.js': `// Your JavaScript goes here\nconsole.log('Hello from CodeNest');`,
+            'styles.css': `body { font-family: system-ui, sans-serif; background: #ffffff; }`
+          };
+          localStorage.setItem('codenest_files', JSON.stringify(initialFiles));
+        }
+      }
+      initStorage();
+
+      const codeEditor = document.getElementById('codeEditor');
+      const previewFrame = document.getElementById('previewFrame');
+      const editorStatus = document.getElementById('editorStatus');
+      const fileTabs = document.querySelectorAll('.file-tab');
+      const navBtns = document.querySelectorAll('.nav-btn');
+      const runPreviewBtn = document.getElementById('runPreviewBtn');
+      const saveFileBtn = document.getElementById('saveFileBtn');
+      const newRepoBtn = document.getElementById('newRepoBtn');
+      const uploadFileBtn = document.getElementById('uploadFileBtn');
+      const newProjectBtn = document.getElementById('newProjectBtn');
+      const uploadLocalBtn = document.getElementById('uploadLocalBtn');
+      const createRepoRightBtn = document.getElementById('createRepoRightBtn');
+      const syncIndexedDB = document.getElementById('syncIndexedDB');
+
+      let currentFile = 'index.html';
+      let currentRepo = 'local-project';
+
+      function loadFile(fileName) {
+        const files = JSON.parse(localStorage.getItem('codenest_files')) || {};
+        const content = files[fileName] || '';
+        codeEditor.value = content;
+        currentFile = fileName;
+        fileTabs.forEach(tab => {
+          const tabText = tab.innerText.trim();
+          if (tabText.includes(fileName)) {
+            tab.classList.add('active');
+          } else {
+            tab.classList.remove('active');
+          }
+        });
+        document.querySelector('.editor-header span:first-child').innerHTML = `<i class="fas fa-file-code"></i> ${fileName} · editing`;
+        editorStatus.textContent = 'saved';
+      }
+
+      function saveCurrentFile() {
+        const files = JSON.parse(localStorage.getItem('codenest_files')) || {};
+        files[currentFile] = codeEditor.value;
+        localStorage.setItem('codenest_files', JSON.stringify(files));
+        editorStatus.textContent = 'saved';
+        if (currentFile.endsWith('.html')) {
+          updatePreview(codeEditor.value);
+        }
+      }
+
+      function updatePreview(htmlContent) {
+        if (currentFile.endsWith('.html')) {
+          previewFrame.srcdoc = htmlContent;
+        } else {
+          previewFrame.srcdoc = `<p style="padding:12px; color:#656d76;">Preview available for HTML files.</p>`;
+        }
+      }
+
+      loadFile('index.html');
+      updatePreview(codeEditor.value);
+
+      fileTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          const text = tab.innerText.trim();
+          let fileName = 'index.html';
+          if (text.includes('script.js')) fileName = 'script.js';
+          else if (text.includes('styles.css')) fileName = 'styles.css';
+          loadFile(fileName);
+          if (fileName.endsWith('.html')) {
+            updatePreview(codeEditor.value);
+          } else {
+            previewFrame.srcdoc = `<p style="padding:12px; color:#656d76;">Preview available for HTML files.</p>`;
+          }
+        });
+      });
+
+      codeEditor.addEventListener('input', () => {
+        editorStatus.textContent = 'unsaved changes';
+        if (currentFile.endsWith('.html')) {
+          previewFrame.srcdoc = codeEditor.value;
+        }
+      });
+
+      runPreviewBtn.addEventListener('click', () => {
+        if (currentFile.endsWith('.html')) {
+          previewFrame.srcdoc = codeEditor.value;
+        } else {
+          previewFrame.srcdoc = `<p style="padding:12px;">Preview only for HTML.</p>`;
+        }
+      });
+
+      saveFileBtn.addEventListener('click', () => {
+        saveCurrentFile();
+      });
+
+      navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          navBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const view = btn.dataset.view;
+          if (view === 'home') {
+            loadFile('index.html');
+            updatePreview(codeEditor.value);
+            document.getElementById('savedLibraryBlock').style.display = 'none';
+          } else if (view === 'repos') {
+            document.querySelector('.repo-item')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            document.getElementById('savedLibraryBlock').style.display = 'none';
+          } else if (view === 'search') {
+            const query = prompt('Search repositories (simulated):', 'project');
+            if (query) alert(`Search results for "${query}" – local only.`);
+          } else if (view === 'saved') {
+            const libBlock = document.getElementById('savedLibraryBlock');
+            libBlock.style.display = 'block';
+            libBlock.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+
+      document.querySelectorAll('.repo-item').forEach(repo => {
+        repo.addEventListener('click', () => {
+          const repoName = repo.dataset.repo || 'local-project';
+          currentRepo = repoName;
+          editorStatus.textContent = `repo: ${repoName}`;
+          const files = JSON.parse(localStorage.getItem('codenest_files')) || {};
+          if (repoName === 'web-sandbox') {
+            files['index.html'] = `<h1>Web Sandbox</h1><p>This is another repository.</p>`;
+          } else if (repoName === 'utils') {
+            files['index.html'] = `<h1>Utils</h1><p>Helper functions.</p>`;
+          } else {
+            files['index.html'] = `<!DOCTYPE html><html><body><h1>Hello, CodeNest!</h1><p>Edit this code and preview it instantly.</p></body></html>`;
+          }
+          localStorage.setItem('codenest_files', JSON.stringify(files));
+          loadFile('index.html');
+          updatePreview(codeEditor.value);
+        });
+      });
+
+      document.querySelectorAll('.project-item').forEach(proj => {
+        proj.addEventListener('click', () => {
+          const projName = proj.dataset.project || 'todo-app';
+          editorStatus.textContent = `loaded: ${projName}`;
+          const files = JSON.parse(localStorage.getItem('codenest_files')) || {};
+          if (projName === 'todo-app') {
+            files['index.html'] = `<!DOCTYPE html><html><body><h2>Todo App</h2><ul><li>Sample task</li></ul></body></html>`;
+          } else if (projName === 'landing-page') {
+            files['index.html'] = `<!DOCTYPE html><html><body><h1>Landing Page</h1><p>Welcome!</p></body></html>`;
+          } else {
+            files['index.html'] = `<!DOCTYPE html><html><body><h2>Dashboard</h2><p>Stats here</p></body></html>`;
+          }
+          localStorage.setItem('codenest_files', JSON.stringify(files));
+          loadFile('index.html');
+          updatePreview(codeEditor.value);
+        });
+      });
+
+      newRepoBtn.addEventListener('click', () => {
+        const repoName = prompt('Enter new repository name:', 'my-repo');
+        if (repoName) {
+          const repoList = document.getElementById('repoListLeft');
+          const newItem = document.createElement('div');
+          newItem.className = 'repo-item';
+          newItem.innerHTML = `<i class="fas fa-folder"></i><span>${repoName}</span>`;
+          repoList.appendChild(newItem);
+          alert(`Repository "${repoName}" created locally.`);
+        }
+      });
+
+      uploadFileBtn.addEventListener('click', () => {
+        const fileName = prompt('File name (e.g., myfile.html):', 'new-file.html');
+        if (fileName) {
+          const files = JSON.parse(localStorage.getItem('codenest_files')) || {};
+          files[fileName] = `// Content of ${fileName}`;
+          localStorage.setItem('codenest_files', JSON.stringify(files));
+          alert(`File "${fileName}" uploaded to local storage.`);
+        }
+      });
+
+      newProjectBtn.addEventListener('click', () => {
+        alert('New project created (local). Edit files in the editor.');
+      });
+
+      uploadLocalBtn.addEventListener('click', () => {
+        const fileName = prompt('Upload file (simulated):', 'upload.txt');
+        if (fileName) {
+          const files = JSON.parse(localStorage.getItem('codenest_files')) || {};
+          files[fileName] = `Uploaded content for ${fileName}`;
+          localStorage.setItem('codenest_files', JSON.stringify(files));
+          alert(`File ${fileName} saved locally.`);
+        }
+      });
+
+      createRepoRightBtn.addEventListener('click', () => {
+        newRepoBtn.click();
+      });
+
+      syncIndexedDB.addEventListener('click', () => {
+        const files = JSON.parse(localStorage.getItem('codenest_files')) || {};
+        files[currentFile] = codeEditor.value;
+        localStorage.setItem('codenest_files', JSON.stringify(files));
+        alert('All files saved successfully.');
+        editorStatus.textContent = 'saved';
+      });
+
+      window.addEventListener('beforeunload', () => {
+        saveCurrentFile();
+      });
+
+      setTimeout(() => {
+        if (currentFile.endsWith('.html')) {
+          previewFrame.srcdoc = codeEditor.value;
+        }
+      }, 50);
+
+    })();
+  </script>
+</body>
+</html>
