@@ -149,6 +149,49 @@ button.chip{cursor:pointer}
 .md img{max-width:100%}
 .dropzone{position:fixed;inset:0;background:rgba(194,231,255,.85);z-index:90;display:grid;place-items:center;font:500 22px var(--font);color:var(--btn-text);border:4px dashed #4285F4;margin:8px;border-radius:24px}
 
+/* المشغلات (موسيقى / فيديو) */
+#mini{flex:none;background:#fff;border-top:1px solid var(--line-strong)}
+.mini-prog{height:3px;background:#E8EAED;direction:ltr}
+.mini-prog i{display:block;height:100%;width:0;background:#0B57D0}
+.mini-body{display:flex;align-items:center;gap:6px;padding:6px 10px;height:58px}
+.mini-art,.mp-art{width:42px;height:42px;border-radius:10px;background:var(--btn);color:var(--btn-text);display:grid;place-items:center;flex:none}
+.mini-t{flex:1;min-width:0;cursor:pointer;display:flex;flex-direction:column;line-height:1.35}
+.mini-t b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini-t .sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel{height:40px;border:1px solid var(--line-strong);border-radius:20px;padding:0 14px;background:#fff;max-width:220px;outline:0}
+.player{padding:20px;display:flex;flex-direction:column;gap:14px;margin-bottom:20px}
+.mp-top{display:flex;gap:16px;align-items:center}
+.mp-art{width:84px;height:84px;border-radius:18px}
+.mp-art .ic{width:40px;height:40px}
+.mp-title{font:500 20px var(--font);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seek{display:flex;align-items:center;gap:10px;direction:ltr;font-size:12px;color:var(--muted)}
+.seek input{flex:1;min-width:0}
+input[type=range]{accent-color:#0B57D0;cursor:pointer;height:24px}
+.ctl{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;direction:ltr}
+.ctl .big{width:58px;height:58px;background:var(--btn);color:var(--btn-text)}
+.ctl .big:hover{background:var(--btn-hover)}
+.ctl .big .ic{width:30px;height:30px}
+.ctl .vol{display:flex;align-items:center;gap:2px}
+.ctl .vol input{width:90px}
+.ctl .sel{height:36px;font-size:13px}
+.tlist{overflow:hidden}
+.trk{display:flex;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.trk:last-child{border:0}
+.trk:hover{background:var(--surface)}
+.trk .ic{color:var(--muted)}
+.trk.cur{background:var(--btn);color:var(--btn-text)}
+.trk.cur .ic,.trk.cur .sub{color:var(--btn-text)}
+.vgrid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+@media(max-width:900px){.vgrid{grid-template-columns:minmax(0,1fr)}}
+.vbox{position:relative;background:#000;border-radius:16px;overflow:hidden;aspect-ratio:16/9}
+.vbox video{width:100%;height:100%;display:block;background:#000}
+.vbox:fullscreen{border-radius:0;aspect-ratio:auto}
+.vempty{position:absolute;inset:0;display:grid;place-items:center;color:#9AA0A6;text-align:center;padding:16px;pointer-events:none}
+.vempty .ic{width:48px;height:48px;margin-bottom:8px}
+.vinfo{padding:12px 4px 4px}
+.vlist{max-height:68vh;overflow:auto}
+@media(max-width:900px){.vlist{max-height:none}}
+
 /* نتائج البحث */
 .sres{padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer}
 .sres .path{color:var(--muted);font-size:12px;direction:ltr;text-align:start}
@@ -270,6 +313,7 @@ mark{background:#FEF0A0;color:inherit;border-radius:2px}
     <button class="icon-btn" id="langBtn" data-act="lang" aria-label="Language"></button>
   </header>
   <main id="view"></main>
+  <div id="mini" hidden></div>
   <nav id="bottomnav"></nav>
 </div>
 
@@ -334,7 +378,18 @@ const ICON={
  check:'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z',
  image:'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
  translate:'M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z',
- book:'M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z'
+ book:'M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z',
+ music:'M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z',
+ pause:'M6 19h4V5H6v14zm8-14v14h4V5h-4z',
+ next:'M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z',
+ prev:'M6 6h2v12H6zm3.5 6l8.5 6V6z',
+ shuffle:'M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z',
+ repeat:'M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z',
+ repeat1:'M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z',
+ vol:'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z',
+ mute:'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z',
+ movie:'M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z',
+ pip:'M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z'
 };
 const ic=(n,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICON[n]}"/></svg>`;
 
@@ -366,9 +421,11 @@ function resolvePath(base,ref){
   return parts.join('/');
 }
 const TEXT_EXT=new Set('txt md markdown json js mjs cjs jsx ts tsx html htm css scss less xml svg yml yaml toml ini cfg conf env csv tsv py rb php java c h cpp hpp cs go rs kt swift sh bash zsh bat ps1 sql vue svelte lock log gitignore gitattributes editorconfig map'.split(' '));
-const BIN_EXT=new Set('png jpg jpeg gif webp bmp ico avif woff woff2 ttf otf eot mp3 wav ogg mp4 webm mov pdf zip gz tar rar 7z wasm exe dll bin'.split(' '));
+const BIN_EXT=new Set('png jpg jpeg gif webp bmp ico avif woff woff2 ttf otf eot mp3 wav ogg oga m4a aac opus flac aiff mp4 m4v webm mov ogv mkv pdf zip gz tar rar 7z wasm exe dll bin'.split(' '));
+const AUDIO_EXT=new Set(['mp3','ogg','oga','m4a','aac','wav','flac','opus']);
+const VIDEO_EXT=new Set(['mp4','m4v','webm','mov','ogv','mkv']);
 const IMG_EXT=new Set(['png','jpg','jpeg','gif','webp','bmp','ico','avif']);
-const MIME={html:'text/html',htm:'text/html',css:'text/css',js:'text/javascript',mjs:'text/javascript',json:'application/json',svg:'image/svg+xml',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp',ico:'image/x-icon',bmp:'image/bmp',avif:'image/avif',md:'text/markdown',txt:'text/plain',xml:'application/xml',woff:'font/woff',woff2:'font/woff2',ttf:'font/ttf',otf:'font/otf',mp3:'audio/mpeg',wav:'audio/wav',ogg:'audio/ogg',mp4:'video/mp4',webm:'video/webm',pdf:'application/pdf',wasm:'application/wasm',zip:'application/zip'};
+const MIME={html:'text/html',htm:'text/html',css:'text/css',js:'text/javascript',mjs:'text/javascript',json:'application/json',svg:'image/svg+xml',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp',ico:'image/x-icon',bmp:'image/bmp',avif:'image/avif',md:'text/markdown',txt:'text/plain',xml:'application/xml',woff:'font/woff',woff2:'font/woff2',ttf:'font/ttf',otf:'font/otf',mp3:'audio/mpeg',wav:'audio/wav',ogg:'audio/ogg',oga:'audio/ogg',opus:'audio/ogg',m4a:'audio/mp4',aac:'audio/aac',flac:'audio/flac',mp4:'video/mp4',m4v:'video/mp4',webm:'video/webm',mov:'video/quicktime',ogv:'video/ogg',mkv:'video/x-matroska',pdf:'application/pdf',wasm:'application/wasm',zip:'application/zip'};
 const mimeOf=p=>MIME[extOf(p)]||'application/octet-stream';
 function looksText(name,buf){
   const e=extOf(name);if(TEXT_EXT.has(e))return true;if(BIN_EXT.has(e))return false;
@@ -914,6 +971,7 @@ function applyLang(){
   $('#tsq').placeholder=t('ابحث في المستودعات والملفات والأكواد','Search repositories, files and code');
   $('#bottomnav').innerHTML=NAV.map(n=>`<a class="nav-item" data-nav="${n.k}" href="#/${n.k}"><span class="pill">${ic(n.i)}</span><span>${esc(n.l())}</span></a>`).join('');
   $('#langBtn').innerHTML=ic('translate');$('#langBtn').title=t('English','العربية');
+  buildMini();
 }
 const setNav=k=>document.querySelectorAll('.nav-item').forEach(a=>a.classList.toggle('on',a.dataset.nav===k));
 function setView(html,cls=''){
@@ -926,10 +984,18 @@ const statLang=e=>{const l=LANG_BY_EXT[e];return {js:'JavaScript',html:'HTML',cs
 const EXT_COLOR={html:'#D93025',htm:'#D93025',css:'#1967D2',scss:'#1967D2',js:'#B06000',mjs:'#B06000',jsx:'#B06000',ts:'#1967D2',tsx:'#1967D2',json:'#188038',md:'#5F6368',py:'#1A73E8',svg:'#E8710A'};
 function fileIcon(name,dir){
   if(dir)return `<svg class="ic" viewBox="0 0 24 24" style="fill:#5F6368"><path d="${ICON.folder}"/></svg>`;
-  const e=extOf(name);const c=IMG_EXT.has(e)?'#9334E6':(EXT_COLOR[e]||'#80868B');
-  return `<svg class="ic" viewBox="0 0 24 24" style="fill:${c}"><path d="${ICON[IMG_EXT.has(e)?'image':'file']}"/></svg>`;
+  const e=extOf(name),au=AUDIO_EXT.has(e),vi=VIDEO_EXT.has(e);
+  const c=IMG_EXT.has(e)?'#9334E6':au?'#E8710A':vi?'#D93025':(EXT_COLOR[e]||'#80868B');
+  return `<svg class="ic" viewBox="0 0 24 24" style="fill:${c}"><path d="${ICON[IMG_EXT.has(e)?'image':au?'music':vi?'movie':'file']}"/></svg>`;
 }
 const repoHash=(id,mode,p)=>'#/r/'+id+(mode?'/'+mode:'')+(p?'/'+encPath(p):'');
+function fileTarget(id,r){
+  if(r.dir)return repoHash(id,'tree',r.path);
+  const e=extOf(r.path);
+  if(AUDIO_EXT.has(e))return '#/music?r='+id+'&p='+encodeURIComponent(r.path);
+  if(VIDEO_EXT.has(e))return '#/video?r='+id+'&p='+encodeURIComponent(r.path);
+  return repoHash(id,'blob',r.path);
+}
 function wordmark(){
   const n=CONFIG.APP_NAME,cols=['#4285F4','#EA4335','#F9AB00','#34A853'];
   if(/[\u0600-\u06FF]/.test(n))return `<span style="color:#4285F4">${esc(n)}</span>`;
@@ -961,6 +1027,10 @@ async function viewHome(){
       <div class="hero-actions">
         <button class="btn" data-act="newRepo">${ic('add')}${t('مستودع جديد','New repository')}</button>
         <button class="btn green" data-act="importMenu">${ic('upload')}${t('رفع مشروع','Upload project')}</button>
+      </div>
+      <div class="hero-actions" style="margin-top:12px">
+        <a class="btn" href="#/music">${ic('music')}${t('مشغل الموسيقى','Music player')}</a>
+        <a class="btn green" href="#/video">${ic('movie')}${t('مشغل الفيديو','Video player')}</a>
       </div>
     </div>
     ${repos.length?`<div class="sec-h"><h2>${t('آخر المشاريع','Recent projects')}</h2><a href="#/repos">${t('عرض الكل','View all')}</a></div><div class="grid">${repos.slice(0,6).map(repoCard).join('')}</div>`:
@@ -1076,7 +1146,7 @@ async function viewRepoPage(id,tab,dir,my){
     body=acts.length?`<div class="card alist">${acts.map(a=>actRow(a,'')).join('')}</div>`:`<div class="empty">${t('لا يوجد نشاط','No activity')}</div>`;
   }else{
     const parent=dir?`<div class="frow" data-act="go" data-to="${dirName(dir)?repoHash(id,'tree',dirName(dir)):repoHash(id)}"><span>${ic('back','flip')}</span><span class="fn">..</span><span></span><span></span><span></span></div>`:'';
-    body=crumbs+(rows.length||dir?`<div class="card files"><div class="frow fh"><span></span><span>${t('الاسم','Name')}</span><span class="fsize">${t('الحجم','Size')}</span><span class="fdate">${t('آخر تعديل','Modified')}</span><span></span></div>${parent}${rows.map(r=>`<div class="frow" data-act="go" data-to="${repoHash(id,r.dir?'tree':'blob',r.path)}"><span>${fileIcon(r.name,r.dir)}</span><span class="fn" dir="auto">${esc(r.name)}</span><span class="fsize">${r.dir?'':fmtBytes(r.size)}</span><span class="fdate">${rel(r.updated)}</span><button class="icon-btn xs" data-act="rowMenu" data-p="${esc(r.path)}" data-d="${r.dir?1:0}" aria-label="menu">${ic('more')}</button></div>`).join('')}${!rows.length?`<div class="empty" style="padding:28px">${t('هذا المجلد فارغ','This folder is empty')}</div>`:''}</div>`:
+    body=crumbs+(rows.length||dir?`<div class="card files"><div class="frow fh"><span></span><span>${t('الاسم','Name')}</span><span class="fsize">${t('الحجم','Size')}</span><span class="fdate">${t('آخر تعديل','Modified')}</span><span></span></div>${parent}${rows.map(r=>`<div class="frow" data-act="go" data-to="${fileTarget(id,r)}"><span>${fileIcon(r.name,r.dir)}</span><span class="fn" dir="auto">${esc(r.name)}</span><span class="fsize">${r.dir?'':fmtBytes(r.size)}</span><span class="fdate">${rel(r.updated)}</span><button class="icon-btn xs" data-act="rowMenu" data-p="${esc(r.path)}" data-d="${r.dir?1:0}" aria-label="menu">${ic('more')}</button></div>`).join('')}${!rows.length?`<div class="empty" style="padding:28px">${t('هذا المجلد فارغ','This folder is empty')}</div>`:''}</div>`:
       `<div class="card empty"><div class="big">${ic('code')}</div><h3>${t('المستودع فارغ','This repository is empty')}</h3><div style="margin-bottom:16px">${t('أنشئ ملفاً أو ارفع ملفاتك، أو اسحبها وأفلتها هنا.','Create a file, upload files, or drag and drop them here.')}</div><div class="row" style="justify-content:center"><button class="btn" data-act="newFile">${ic('newFile')}${t('ملف جديد','New file')}</button><button class="btn green" data-act="uploadMenu">${ic('upload')}${t('رفع','Upload')}</button></div></div>`);
     const rd=[...ent.values()].find(e=>!e.dir&&/^readme(\.md|\.markdown)?$/i.test(e.name)&&/\.(md|markdown)$/i.test(e.name));
     if(rd){const f=await readFile(id,rd.path);if(f&&f.text!==undefined)body+=`<div class="card" style="margin-top:16px"><div class="sub" style="padding:10px 16px;border-bottom:1px solid var(--line)">${ic('file')} ${esc(rd.name)}</div><div class="md" id="readme">${mdToHtml(f.text)}</div></div>`}
@@ -1088,7 +1158,7 @@ async function viewRepoPage(id,tab,dir,my){
     ${repo.desc?`<div class="rdesc" dir="auto">${esc(repo.desc)}</div>`:''}
     <div class="row" style="margin:8px 0"><span class="chip">${vis.length} ${t('ملف','files')}</span><span class="chip">${fmtBytes(repo.size)}</span><span class="chip">${t('آخر تحديث','Updated')} ${rel(repo.updated)}</span></div>
     ${tot?`<div class="lbar">${lk.map(k=>`<i style="width:${lang[k]/tot*100}%;background:${LANG_COL[k]}"></i>`).join('')}</div><div class="legend">${lk.slice(0,6).map(k=>`<span><b style="background:${LANG_COL[k]}"></b>${k} ${(lang[k]/tot*100).toFixed(1)}%</span>`).join('')}</div>`:''}
-    <div class="row" style="margin:18px 0 4px"><button class="btn" data-act="openEditor">${ic('code')}${t('فتح المحرر','Open editor')}</button><button class="btn" data-act="newFile">${ic('newFile')}${t('ملف جديد','New file')}</button><button class="btn green" data-act="newFolder">${ic('newFolder')}${t('مجلد جديد','New folder')}</button><button class="btn green" data-act="uploadMenu">${ic('upload')}${t('رفع','Upload')}</button></div>
+    <div class="row" style="margin:18px 0 4px"><button class="btn" data-act="openEditor">${ic('code')}${t('فتح المحرر','Open editor')}</button><button class="btn" data-act="newFile">${ic('newFile')}${t('ملف جديد','New file')}</button><button class="btn green" data-act="newFolder">${ic('newFolder')}${t('مجلد جديد','New folder')}</button><button class="btn green" data-act="uploadMenu">${ic('upload')}${t('رفع','Upload')}</button>${vis.some(m=>AUDIO_EXT.has(extOf(m.path)))?`<a class="btn" href="#/music?r=${id}">${ic('music')}${t('مشغل الموسيقى','Music player')}</a>`:''}${vis.some(m=>VIDEO_EXT.has(extOf(m.path)))?`<a class="btn green" href="#/video?r=${id}">${ic('movie')}${t('مشغل الفيديو','Video player')}</a>`:''}</div>
     <div class="tabs"><div class="tab ${tab!=='activity'?'on':''}" data-act="go" data-to="${repoHash(id,dir?'tree':'',dir)}">${t('الكود','Code')}</div><div class="tab ${tab==='activity'?'on':''}" data-act="go" data-to="${repoHash(id,'activity')}">${t('النشاط','Activity')}</div></div>
     ${body}
   </div>`;
@@ -1233,6 +1303,10 @@ function makeStaticPane(tab,f){
   if(IMG_EXT.has(ext)){
     tab.url=URL.createObjectURL(new Blob([f.buffer],{type:mimeOf(tab.path)}));
     el.innerHTML=`<div class="static"><div><img src="${tab.url}" alt=""><div class="sub" style="margin-top:10px">${esc(baseName(tab.path))} · ${fmtBytes(f.meta.size)}</div></div></div>`;
+  }else if(AUDIO_EXT.has(ext)||VIDEO_EXT.has(ext)){
+    const isV=VIDEO_EXT.has(ext);
+    tab.url=URL.createObjectURL(new Blob([f.buffer],{type:mimeOf(tab.path)}));
+    el.innerHTML=`<div class="static"><div style="width:min(100%,720px)">${isV?`<video src="${tab.url}" controls playsinline style="width:100%;max-height:62vh;background:#000;border-radius:12px"></video>`:`<div class="mp-art" style="margin:0 auto 16px;width:96px;height:96px;border-radius:20px">${ic('music')}</div><audio src="${tab.url}" controls style="width:100%"></audio>`}<div class="sub" style="margin:10px 0 14px" dir="ltr">${esc(baseName(tab.path))} · ${fmtBytes(f.meta.size)}</div><button class="btn" data-act="edPlayer">${ic(isV?'movie':'music')}${isV?t('فتح في مشغل الفيديو','Open in video player'):t('فتح في مشغل الموسيقى','Open in music player')}</button></div></div>`;
   }else{
     el.innerHTML=`<div class="static"><div><div class="empty"><div class="big">${ic('file')}</div><h3 dir="ltr">${esc(baseName(tab.path))}</h3><div style="margin-bottom:14px">${fmtBytes(f.meta.size)} · ${t('ملف ثنائي لا يمكن تحريره','Binary file, cannot be edited')}</div><button class="btn" data-act="edDownload">${ic('download')}${t('تنزيل','Download')}</button></div></div></div>`;
   }
@@ -1367,7 +1441,7 @@ const Ed={
       if(!f){toast(t('الملف غير موجود','File not found'));return}
       tab={path,kind:'text',text:'',saved:'',dirty:false,pane:null,timer:0};
       if(f.text!==undefined){tab.text=tab.saved=f.text;tab.pane=makePane(tab)}
-      else{tab.kind=IMG_EXT.has(extOf(path))?'image':'binary';tab.pane=makeStaticPane(tab,f)}
+      else{const xe=extOf(path);tab.kind=IMG_EXT.has(xe)?'image':(AUDIO_EXT.has(xe)||VIDEO_EXT.has(xe))?'media':'binary';tab.pane=makeStaticPane(tab,f)}
       Ed.tabs.push(tab);$('.pane-wrap',Ed.root).appendChild(tab.pane.el);
     }
     Ed.activate(path,o);
@@ -1375,7 +1449,7 @@ const Ed={
   activate(path,o={}){
     const tab=Ed.tab(path);if(!tab)return;
     Ed.active=path;Ed.pvNav=null;
-    Ed.tabs.forEach(x=>{x.pane.el.hidden=x.path!==path});
+    Ed.tabs.forEach(x=>{x.pane.el.hidden=x.path!==path;if(x.path!==path)x.pane.el.querySelectorAll('audio,video').forEach(m=>m.pause())});
     $('.empty-ed',Ed.root).hidden=true;
     let d=dirName(path);while(d){Ed.exp.add(d);d=dirName(d)}
     history.replaceState(null,'',repoHash(Ed.repoId,'blob',path));
@@ -1640,9 +1714,260 @@ window.addEventListener('message',e=>{
 });
 window.addEventListener('beforeunload',e=>{if(Ed.tabs.some(x=>x.dirty)){e.preventDefault();e.returnValue=''}});
 
+/* ---------- 4.11b مشغّل الموسيقى ومشغّل الفيديو ---------- */
+const fmtTime=s=>{if(!isFinite(s)||s<0)s=0;s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0')};
+async function mediaList(kind,rid){
+  const set=kind==='audio'?AUDIO_EXT:VIDEO_EXT;
+  const [ms,repos]=await Promise.all([rid?listFiles(rid):R(store('files').getAll()),allRepos()]);
+  const rn=new Map(repos.map(r=>[r.id,r.name]));
+  return ms.filter(m=>set.has(extOf(m.path))).map(m=>({repoId:m.repoId,path:m.path,name:baseName(m.path),size:m.size,repo:rn.get(m.repoId)||''})).sort((a,b)=>cmp(a.repo,b.repo)||cmp(a.path,b.path));
+}
+const mediaKey=it=>it.repoId+'/'+it.path;
+function buildMini(){
+  const m=$('#mini');if(!m)return;
+  m.innerHTML=`<div class="mini-prog"><i></i></div><div class="mini-body"><div class="mini-art">${ic('music')}</div><div class="mini-t" data-act="go" data-to="#/music"><b id="miniTitle" dir="auto"></b><span class="sub" id="miniSub" dir="auto"></span></div><button class="icon-btn" data-act="mPrev" aria-label="${t('السابق','Previous')}">${ic('prev')}</button><button class="icon-btn" id="miniPlay" data-act="mToggle" aria-label="${t('تشغيل / إيقاف','Play / Pause')}">${ic('play')}</button><button class="icon-btn" data-act="mNext" aria-label="${t('التالي','Next')}">${ic('next')}</button><button class="icon-btn" data-act="mClose" aria-label="${t('إغلاق','Close')}">${ic('close')}</button></div>`;
+  Music.sync();
+}
+const Music={
+  a:new Audio(),queue:[],i:-1,shuffle:false,rep:0,rate:1,url:null,tok:0,drag:false,lib:[],_mk:'',
+  cur(){return Music.queue[Music.i]||null},
+  init(){
+    const a=Music.a;a.preload='metadata';
+    a.addEventListener('timeupdate',Music.tick);a.addEventListener('durationchange',Music.tick);
+    a.addEventListener('play',Music.sync);a.addEventListener('pause',Music.sync);
+    a.addEventListener('ended',()=>Music.next(true));
+    a.addEventListener('error',()=>{if(Music.url)toast(t('تعذّر تشغيل هذا الملف — قد لا يدعم المتصفح ترميزه','Cannot play this file — the browser may not support its codec'))});
+    try{const ms=navigator.mediaSession;if(ms){
+      ms.setActionHandler('play',()=>a.play());ms.setActionHandler('pause',()=>a.pause());
+      ms.setActionHandler('previoustrack',()=>Music.prev());ms.setActionHandler('nexttrack',()=>Music.next());
+      ms.setActionHandler('seekto',d=>{a.currentTime=d.seekTime});
+    }}catch(e){}
+  },
+  setQueue(list,i){Music.queue=list.slice();Music.load(i)},
+  async load(i){
+    const it=Music.queue[i];if(!it)return;
+    Music.i=i;const tok=++Music.tok;Music.sync();
+    const f=await readFile(it.repoId,it.path);
+    if(tok!==Music.tok)return;
+    if(!f||f.buffer===undefined){toast(t('الملف غير موجود','File not found'));return}
+    if(Music.url)URL.revokeObjectURL(Music.url);
+    Music.url=URL.createObjectURL(new Blob([f.buffer],{type:mimeOf(it.path)}));
+    const a=Music.a;a.src=Music.url;a.defaultPlaybackRate=Music.rate;a.playbackRate=Music.rate;
+    a.play().catch(()=>{});
+  },
+  toggle(){const a=Music.a;if(!Music.cur())return;a.paused?a.play().catch(()=>{}):a.pause()},
+  next(auto){
+    const n=Music.queue.length,a=Music.a;if(!n)return;
+    if(auto&&Music.rep===2){a.currentTime=0;a.play().catch(()=>{});return}
+    let j;
+    if(Music.shuffle&&n>1){do{j=Math.floor(Math.random()*n)}while(j===Music.i)}
+    else{j=Music.i+1;if(j>=n){if(Music.rep===1||!auto)j=0;else{a.pause();a.currentTime=0;Music.sync();return}}}
+    Music.load(j);
+  },
+  prev(){
+    const n=Music.queue.length,a=Music.a;if(!n)return;
+    if(a.currentTime>3){a.currentTime=0;return}
+    Music.load((Music.i-1+n)%n);
+  },
+  close(){
+    const a=Music.a;a.pause();
+    if(Music.url){URL.revokeObjectURL(Music.url);Music.url=null}
+    a.removeAttribute('src');a.load();Music.queue=[];Music.i=-1;Music.tok++;Music.sync();
+  },
+  tick(){
+    const a=Music.a,d=a.duration||0,c=a.currentTime||0,ok=d&&isFinite(d);
+    const p=$('.mini-prog i');if(p)p.style.width=(ok?c/d*100:0)+'%';
+    const s=$('#mpSeek');if(s&&!Music.drag)s.value=ok?Math.round(c/d*1000):0;
+    const cu=$('#mpCur');if(cu)cu.textContent=fmtTime(c);
+    const du=$('#mpDur');if(du)du.textContent=ok?fmtTime(d):'0:00';
+  },
+  sync(){
+    const it=Music.cur(),a=Music.a,pl=!!it&&!a.paused;
+    const mini=$('#mini');if(!mini)return;mini.hidden=!it;
+    const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};
+    set('#miniTitle',it?it.name:'');set('#miniSub',it?it.repo:'');
+    const mp=$('#miniPlay');if(mp)mp.innerHTML=ic(pl?'pause':'play');
+    set('#mpTitle',it?it.name:t('لا يوجد ملف قيد التشغيل','Nothing playing'));
+    set('#mpSub',it?it.repo+(dirName(it.path)?' / '+dirName(it.path):''):t('اختر ملفاً من القائمة','Pick a track from the list'));
+    const pb=$('#mpPlay');if(pb)pb.innerHTML=ic(pl?'pause':'play');
+    const sh=$('#mpShuf');if(sh)sh.classList.toggle('on',Music.shuffle);
+    const rp=$('#mpRep');if(rp){rp.classList.toggle('on',Music.rep>0);rp.innerHTML=ic(Music.rep===2?'repeat1':'repeat')}
+    const mu=$('#mpMute');if(mu)mu.innerHTML=ic(a.muted||a.volume===0?'mute':'vol');
+    const k=it?mediaKey(it):'';
+    document.querySelectorAll('.trk.m[data-k]').forEach(r=>r.classList.toggle('cur',!!k&&r.dataset.k===k));
+    if(it&&k!==Music._mk){
+      Music._mk=k;
+      try{if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:it.name,artist:it.repo,album:CONFIG.APP_NAME})}catch(e){}
+    }
+    Music.tick();
+  }
+};
+const Video={
+  lib:[],i:-1,url:null,tok:0,active:false,rate:1,_lp:0,
+  el(){return $('#vid')},
+  posKey:it=>'ds_pos:'+mediaKey(it),
+  getPos(it){try{return +localStorage.getItem(Video.posKey(it))||0}catch(e){return 0}},
+  setPos(it,s){try{s>5?localStorage.setItem(Video.posKey(it),String(Math.floor(s))):localStorage.removeItem(Video.posKey(it))}catch(e){}},
+  rows(){document.querySelectorAll('.trk.v[data-k]').forEach(r=>r.classList.toggle('cur',Video.i>=0&&r.dataset.k===mediaKey(Video.lib[Video.i]||{repoId:'',path:''})))},
+  async load(i){
+    const it=Video.lib[i],v=Video.el();if(!it||!v)return;
+    Music.a.pause();
+    const tok=++Video.tok;Video.i=i;Video.rows();
+    const f=await readFile(it.repoId,it.path);
+    if(tok!==Video.tok||!Video.el())return;
+    if(!f||f.buffer===undefined){toast(t('الملف غير موجود','File not found'));return}
+    if(Video.url)URL.revokeObjectURL(Video.url);
+    Video.url=URL.createObjectURL(new Blob([f.buffer],{type:mimeOf(it.path)}));
+    const saved=Video.getPos(it);
+    v.src=Video.url;v.defaultPlaybackRate=Video.rate;v.playbackRate=Video.rate;
+    v.addEventListener('loadedmetadata',()=>{if(saved>5&&isFinite(v.duration)&&saved<v.duration-5)v.currentTime=saved},{once:true});
+    const e=$('#vEmpty');if(e)e.hidden=true;
+    const T=$('#vTitle'),S=$('#vSub');if(T)T.textContent=it.name;if(S)S.textContent=it.repo+(dirName(it.path)?' / '+dirName(it.path):'');
+    v.play().catch(()=>{});
+  },
+  next(){if(Video.lib.length)Video.load((Video.i+1)%Video.lib.length)},
+  prev(){const n=Video.lib.length;if(n)Video.load((Video.i-1+n)%n)},
+  leave(){
+    if(!Video.active)return;
+    const v=Video.el();if(v){v.pause();v.removeAttribute('src');v.load()}
+    if(Video.url){URL.revokeObjectURL(Video.url);Video.url=null}
+    Video.active=false;Video.i=-1;Video.tok++;
+  }
+};
+function mediaHead(kind,repos,rid){
+  const isA=kind==='audio';
+  const opts=[['',t('كل المستودعات','All repositories')],...repos.map(r=>[r.id,r.name])];
+  return `<div class="row" style="margin:8px 0 16px"><h1 style="margin:0;flex:1;min-width:0">${isA?t('مشغل الموسيقى','Music player'):t('مشغل الفيديو','Video player')}</h1>
+    <select id="mrepo" class="sel" data-kind="${isA?'music':'video'}" aria-label="${t('المستودع','Repository')}">${opts.map(o=>`<option value="${esc(o[0])}" ${o[0]===rid?'selected':''}>${esc(o[1])}</option>`).join('')}</select>
+    <button class="btn green" data-act="mediaUpload" data-kind="${kind}" data-rid="${esc(rid)}">${ic('upload')}${isA?t('رفع ملفات صوتية','Upload audio'):t('رفع فيديوهات','Upload videos')}</button></div>`;
+}
+const trkRow=(it,i,kind)=>`<div class="trk ${kind==='audio'?'m':'v'}" data-k="${esc(mediaKey(it))}" data-act="${kind==='audio'?'mPlay':'vPlay'}" data-i="${i}">${ic(kind==='audio'?'music':'movie')}<div style="flex:1;min-width:0"><div class="fn" dir="auto">${esc(it.name)}</div><div class="sub fn" dir="auto">${esc(it.repo)}${dirName(it.path)?' / '+esc(dirName(it.path)):''}</div></div><span class="sub" dir="ltr">${fmtBytes(it.size)}</span></div>`;
+const mediaEmpty=kind=>`<div class="card empty"><div class="big">${ic(kind==='audio'?'music':'movie')}</div><h3>${kind==='audio'?t('لا توجد ملفات صوتية','No audio files'):t('لا توجد فيديوهات','No videos')}</h3><div style="margin-bottom:16px">${kind==='audio'?t('ارفع ملفات mp3 أو ogg أو m4a أو aac لتشغيلها هنا.','Upload mp3, ogg, m4a or aac files to play them here.'):t('ارفع ملفات mp4 أو webm أو mov لتشغيلها هنا.','Upload mp4, webm or mov files to play them here.')}</div></div>`;
+const filterBox=()=>`<div class="topsearch" style="max-width:none;margin:0 0 12px;height:40px">${ic('search')}<input id="mq" placeholder="${esc(t('تصفية القائمة','Filter list'))}" autocomplete="off"></div>`;
+
+async function viewMusic(qs){
+  const rid=qs.get('r')||'';
+  const [repos,list]=await Promise.all([allRepos(),mediaList('audio',rid)]);
+  const html=`<div class="page narrow">${mediaHead('audio',repos,rid)}
+    <div class="card player">
+      <div class="mp-top"><div class="mp-art">${ic('music')}</div><div style="min-width:0;flex:1"><div class="mp-title" id="mpTitle" dir="auto"></div><div class="sub fn" id="mpSub" dir="auto"></div></div></div>
+      <div class="seek"><span id="mpCur">0:00</span><input type="range" id="mpSeek" min="0" max="1000" step="1" value="0" aria-label="${t('موضع التشغيل','Seek')}"><span id="mpDur">0:00</span></div>
+      <div class="ctl">
+        <button class="icon-btn" id="mpShuf" data-act="mShuffle" aria-label="${t('عشوائي','Shuffle')}">${ic('shuffle')}</button>
+        <button class="icon-btn" data-act="mPrev" aria-label="${t('السابق','Previous')}">${ic('prev')}</button>
+        <button class="icon-btn big" id="mpPlay" data-act="mToggle" aria-label="${t('تشغيل / إيقاف','Play / Pause')}">${ic('play')}</button>
+        <button class="icon-btn" data-act="mNext" aria-label="${t('التالي','Next')}">${ic('next')}</button>
+        <button class="icon-btn" id="mpRep" data-act="mRepeat" aria-label="${t('تكرار','Repeat')}">${ic('repeat')}</button>
+      </div>
+      <div class="ctl">
+        <div class="vol"><button class="icon-btn xs" id="mpMute" data-act="mMute" aria-label="${t('كتم','Mute')}">${ic('vol')}</button><input type="range" id="mpVol" min="0" max="1" step="0.02" value="1" aria-label="${t('مستوى الصوت','Volume')}"></div>
+        <select id="mpRate" class="sel" aria-label="${t('السرعة','Speed')}">${[0.5,0.75,1,1.25,1.5,2].map(r=>`<option value="${r}">${r}x</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="sec-h" style="margin-top:0"><h2>${t('قائمة التشغيل','Playlist')} (${list.length})</h2></div>
+    ${list.length?filterBox()+`<div class="card tlist">${list.map((it,i)=>trkRow(it,i,'audio')).join('')}</div>`:mediaEmpty('audio')}
+  </div>`;
+  return {html,after(){
+    Music.lib=list;
+    $('#mpVol').value=Music.a.volume;$('#mpRate').value=String(Music.rate);
+    Music.sync();
+    const p=qs.get('p');
+    if(p){const i=list.findIndex(x=>x.path===p&&(!rid||x.repoId===rid));if(i>=0)Music.setQueue(list,i)}
+  }};
+}
+async function viewVideo(qs){
+  const rid=qs.get('r')||'';
+  const [repos,list]=await Promise.all([allRepos(),mediaList('video',rid)]);
+  const html=`<div class="page">${mediaHead('video',repos,rid)}
+    <div class="vgrid"><div>
+      <div class="vbox"><video id="vid" controls playsinline preload="metadata"></video><div class="vempty" id="vEmpty"><div>${ic('movie')}<div>${t('اختر فيديو من القائمة لتشغيله','Pick a video from the list to play it')}</div></div></div></div>
+      <div class="vinfo"><div class="mp-title" id="vTitle" dir="auto"></div><div class="sub fn" id="vSub" dir="auto"></div></div>
+      <div class="ctl" style="justify-content:flex-start;margin-top:8px">
+        <button class="icon-btn" data-act="vPrev" aria-label="${t('السابق','Previous')}">${ic('prev')}</button>
+        <button class="icon-btn" data-act="vNext" aria-label="${t('التالي','Next')}">${ic('next')}</button>
+        <select id="vRate" class="sel" aria-label="${t('السرعة','Speed')}">${[0.5,0.75,1,1.25,1.5,2].map(r=>`<option value="${r}">${r}x</option>`).join('')}</select>
+        <button class="icon-btn" data-act="vPip" aria-label="${t('صورة داخل صورة','Picture in picture')}">${ic('pip')}</button>
+        <button class="icon-btn" data-act="vFull" aria-label="${t('ملء الشاشة','Fullscreen')}">${ic('full')}</button>
+      </div>
+      <div class="sub" style="margin-top:10px">${t('اختصارات: مسافة = تشغيل/إيقاف، ← → = ±5 ثوانٍ، J L = ±10، F = ملء الشاشة، M = كتم','Shortcuts: Space = play/pause, ← → = ±5s, J L = ±10s, F = fullscreen, M = mute')}</div>
+    </div>
+    <div><div class="sec-h" style="margin-top:0"><h2>${t('قائمة الفيديو','Videos')} (${list.length})</h2></div>
+      ${list.length?filterBox()+`<div class="card tlist vlist">${list.map((it,i)=>trkRow(it,i,'video')).join('')}</div>`:mediaEmpty('video')}
+    </div></div>
+  </div>`;
+  return {html,after(){
+    Video.lib=list;Video.active=true;Video.i=-1;
+    const v=$('#vid');$('#vRate').value=String(Video.rate);
+    v.addEventListener('play',()=>Music.a.pause());
+    v.addEventListener('ended',()=>{const it=Video.lib[Video.i];if(it)Video.setPos(it,0);if(Video.i<Video.lib.length-1)Video.next()});
+    v.addEventListener('timeupdate',()=>{const it=Video.lib[Video.i];if(it&&Math.abs(v.currentTime-Video._lp)>3){Video._lp=v.currentTime;Video.setPos(it,v.currentTime)}});
+    v.addEventListener('error',()=>{if(v.getAttribute('src'))toast(t('تعذّر تشغيل هذا الفيديو — قد لا يدعم المتصفح ترميزه','Cannot play this video — the browser may not support its codec'))});
+    const p=qs.get('p');
+    if(p){const i=list.findIndex(x=>x.path===p&&(!rid||x.repoId===rid));if(i>=0)Video.load(i)}
+  }};
+}
+const mediaActions={
+  mPlay(el){
+    const i=+el.dataset.i,it=Music.lib[i],c=Music.cur();
+    if(it&&c&&mediaKey(it)===mediaKey(c))Music.toggle();else Music.setQueue(Music.lib,i);
+  },
+  mToggle(){Music.toggle()},mPrev(){Music.prev()},mNext(){Music.next()},mClose(){Music.close()},
+  mShuffle(){Music.shuffle=!Music.shuffle;Music.sync()},
+  mRepeat(){Music.rep=(Music.rep+1)%3;Music.sync()},
+  mMute(){Music.a.muted=!Music.a.muted;Music.sync()},
+  vPlay(el){
+    const i=+el.dataset.i,v=Video.el();
+    if(i===Video.i&&v){v.paused?v.play().catch(()=>{}):v.pause()}else Video.load(i);
+  },
+  vPrev(){Video.prev()},vNext(){Video.next()},
+  vPip(){const v=Video.el();try{if(v&&document.pictureInPictureEnabled&&v.getAttribute('src'))document.pictureInPictureElement?document.exitPictureInPicture():v.requestPictureInPicture()}catch(e){}},
+  vFull(){const b=$('.vbox');try{document.fullscreenElement?document.exitFullscreen():b&&b.requestFullscreen()}catch(e){}},
+  edPlayer(){
+    const c=Ed.cur();if(!c)return;const v=VIDEO_EXT.has(extOf(c.path));
+    Ed.saveAll();location.hash='#/'+(v?'video':'music')+'?r='+Ed.repoId+'&p='+encodeURIComponent(c.path);
+  },
+  async mediaUpload(el){
+    const kind=el.dataset.kind,rid=el.dataset.rid;
+    const acc=kind==='audio'?'audio/*,.mp3,.ogg,.oga,.m4a,.aac,.wav,.flac,.opus':'video/*,.mp4,.m4v,.webm,.mov,.ogv,.mkv';
+    const fl=await pickFiles({multiple:true,accept:acc});if(!fl.length)return;
+    let id=rid;
+    if(!id){
+      const nm=kind==='audio'?['الموسيقى','Music']:['الفيديو','Videos'];
+      const ex=(await allRepos()).find(r=>nm.some(n=>n.toLowerCase()===r.name.toLowerCase()));
+      id=ex?ex.id:(await createRepo({name:t(nm[0],nm[1]),desc:'',vis:'private'})).id;
+    }
+    await ingest(id,[...fl].map(f=>({path:f.name,get:()=>f.arrayBuffer()})),t('رفع وسائط','Media upload'));
+    route();
+  }
+};
+document.addEventListener('input',e=>{
+  const x=e.target;
+  if(x.id==='mpSeek'){Music.drag=true;const d=Music.a.duration;const c=$('#mpCur');if(c&&d&&isFinite(d))c.textContent=fmtTime(x.value/1000*d)}
+  else if(x.id==='mpVol'){Music.a.muted=false;Music.a.volume=+x.value;Music.sync()}
+  else if(x.id==='mq'){const q=x.value.trim().toLowerCase();document.querySelectorAll('.trk[data-k]').forEach(r=>{r.hidden=!!q&&!r.textContent.toLowerCase().includes(q)})}
+});
+document.addEventListener('change',e=>{
+  const x=e.target;
+  if(x.id==='mpSeek'){const d=Music.a.duration;if(d&&isFinite(d))Music.a.currentTime=x.value/1000*d;Music.drag=false}
+  else if(x.id==='mpRate'){Music.rate=+x.value;Music.a.defaultPlaybackRate=Music.rate;Music.a.playbackRate=Music.rate}
+  else if(x.id==='vRate'){Video.rate=+x.value;const v=Video.el();if(v){v.defaultPlaybackRate=Video.rate;v.playbackRate=Video.rate}}
+  else if(x.id==='mrepo'){location.hash='#/'+x.dataset.kind+(x.value?'?r='+encodeURIComponent(x.value):'')}
+});
+document.addEventListener('keydown',e=>{
+  if(!Video.active||e.ctrlKey||e.metaKey||e.altKey||/^(INPUT|TEXTAREA|SELECT|BUTTON|VIDEO)$/.test(e.target.tagName))return;
+  const v=Video.el();if(!v||!v.getAttribute('src'))return;const k=e.key.toLowerCase();
+  if(k===' '||k==='k'){e.preventDefault();v.paused?v.play().catch(()=>{}):v.pause()}
+  else if(k==='arrowright'){e.preventDefault();v.currentTime+=5}
+  else if(k==='arrowleft'){e.preventDefault();v.currentTime-=5}
+  else if(k==='l'){v.currentTime+=10}else if(k==='j'){v.currentTime-=10}
+  else if(k==='m'){v.muted=!v.muted}
+  else if(k==='f'){mediaActions.vFull()}
+});
+
 /* ---------- 4.12 الأوامر (Actions) ---------- */
 const edTab=el=>el.dataset.p;
 const A={
+  ...mediaActions,
   go(el){if(el.dataset.to)location.hash=el.dataset.to},
   lang(){if(Ed.root)Ed.reset(true);LANG=LANG==='ar'?'en':'ar';try{localStorage.setItem('ds_lang',LANG)}catch(e){}applyLang();route()},
   newRepo(){newRepoDialog()},
@@ -1743,7 +2068,7 @@ async function viewEditor(id,path,line,my){
   else Ed.showEmpty();
 }
 async function route(){
-  closeMenu();
+  closeMenu();Video.leave();
   const my=++RT;
   const raw=(location.hash||'#/home').slice(1),qi=raw.indexOf('?');
   const pth=qi<0?raw:raw.slice(0,qi),qs=new URLSearchParams(qi<0?'':raw.slice(qi+1));
@@ -1762,6 +2087,8 @@ async function route(){
       setNav('search');const q=qs.get('q')||'',f=qs.get('f')||'all';setView(viewSearchShell(q,f));
       $('#tsq').value=q;runSearch(q,f);if(!q)$('#sq').focus();
     }
+    else if(k==='music'){setNav('home');const r=await viewMusic(qs);if(my!==RT)return;setView(r.html);r.after()}
+    else if(k==='video'){setNav('home');const r=await viewVideo(qs);if(my!==RT)return;setView(r.html);r.after()}
     else if(k==='saved'){setNav('saved');const h=await viewSaved();if(my!==RT)return;setView(h)}
     else{setNav('home');const h=await viewHome();if(my!==RT)return;setView(h)}
   }catch(err){
@@ -1773,7 +2100,7 @@ async function route(){
 
 /* ---------- 4.14 التشغيل ---------- */
 (async function boot(){
-  applyLang();
+  applyLang();Music.init();
   try{db=await openDB()}catch(e){
     VIEW.innerHTML=`<div class="empty"><div class="big">${ic('close')}</div><h3>${t('التخزين المحلي غير متاح','Local storage unavailable')}</h3><div>${t('هذا التطبيق يحتاج IndexedDB. جرّب نافذة عادية (غير خاصة) أو متصفحاً آخر.','This app needs IndexedDB. Try a normal (non-private) window or another browser.')}</div></div>`;return;
   }
